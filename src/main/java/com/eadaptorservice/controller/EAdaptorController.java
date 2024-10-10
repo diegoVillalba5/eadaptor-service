@@ -39,10 +39,10 @@ public class EAdaptorController {
         try {
             return ResponseEntity.ok(eAdaptorService.processEadaptorRequest(request, body));
         } catch (HttpClientErrorException e) {
-            logger.error("Error processing request", e);
+            logger.error("Error processing request: {}", e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).build();
         } catch (Exception e) {
-            logger.error("Error processing request", e);
+            logger.error("Error processing request: {} {}", e, e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
