@@ -21,6 +21,6 @@ COPY --from=build /app/target/*.jar app.jar
 
 LABEL maintainer="dvillalba@logtech.global"
 
-EXPOSE 443
+EXPOSE 8443
 
 CMD ["java", "-jar", "app.jar"]
