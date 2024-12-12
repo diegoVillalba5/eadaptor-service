@@ -6,7 +6,7 @@ The service is built using the Spring Boot framework and is deployed as a Docker
 
 * Docker Build Command:
 ```bash
-docker build  -t diego005/diego:cargowise-eadaptor-service .
+docker build  -t cargowise-eadaptor-service:1.0.0 .
 ```
 
 * Docker Run Command:
@@ -14,8 +14,8 @@ docker build  -t diego005/diego:cargowise-eadaptor-service .
 docker run -d \
   --name cargowise-eadaptor-service \
   -p 443:443 \
-  -v C:/Users/diego/Desktop/DOCKER/eadaptor-service/logs:/app/logs \
-  -v C:/Users/diego/Desktop/DOCKER/eadaptor-service/outbound:/app/outbound \
+  -v /eadaptor-service/logs:/app/logs \
+  -v /eadaptor-service/outbound:/app/outbound \
   -e EADAPTOR_OUTBOUND_FOLDER=./outbound \
-  diego005/diego:cargowise-eadaptor-service
+  cargowise-eadaptor-service:1.0.0
 ```
