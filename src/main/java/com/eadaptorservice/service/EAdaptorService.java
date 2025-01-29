@@ -38,11 +38,12 @@ public class EAdaptorService {
     public Object processEadaptorRequest(HttpServletRequest request, Envelope body) {
         String soapAction = request.getHeader("SOAPAction");
 
-        logger.info("SOAP Action: {} | Envelope username: {} | Envelope password: {} | Received From Client ID: {} | IP Address: {}",
+        logger.info("SOAP Action: {} | Envelope username: {} | Envelope password: {} | Received From Client ID: {} | eHub Tracking ID: {} | IP Address: {}",
                 soapAction,
                 body.getHeader().getSecurity().getUsernameToken().getUsername(),
                 body.getHeader().getSecurity().getUsernameToken().getPassword().getValue(),
                 body.getBody().getSendStreamRequest().getPayload().getMessage().getClientID(),
+                body.getBody().getSendStreamRequest().getPayload().getMessage().getTrackingID(),
                 request.getRemoteAddr()
         );
         if (!Objects.equals(password, body.getHeader().getSecurity().getUsernameToken().getPassword().getValue())) {
@@ -58,6 +59,7 @@ public class EAdaptorService {
             decodeAndSaveFile(fileName,
                     body.getBody().getSendStreamRequest().getPayload().getMessage().getValue()
             );
+            logger.info("File with name {} saved at {}", fileName, outboundFolder);
         } catch (IOException e) {
             logger.error("Error saving file: {}", e.getMessage());
             return "Error processing request.";
