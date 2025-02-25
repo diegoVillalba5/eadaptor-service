@@ -1,5 +1,6 @@
 package com.eadaptorservice.service;
 
+import com.eadaptorservice.dto.soap.Body;
 import com.eadaptorservice.dto.soap.Envelope;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
 import java.util.zip.GZIPInputStream;
 
@@ -38,31 +40,32 @@ public class EAdaptorService {
     public Object processEadaptorRequest(HttpServletRequest request, Envelope body) {
         String soapAction = request.getHeader("SOAPAction");
 
-        logger.info("SOAP Action: {} | Envelope username: {} | Envelope password: {} | Received From Client ID: {} | eHub Tracking ID: {} | IP Address: {}",
-                soapAction,
-                body.getHeader().getSecurity().getUsernameToken().getUsername(),
-                body.getHeader().getSecurity().getUsernameToken().getPassword().getValue(),
-                body.getBody().getSendStreamRequest().getPayload().getMessage().getClientID(),
-                body.getBody().getSendStreamRequest().getPayload().getMessage().getTrackingID(),
-                request.getRemoteAddr()
-        );
-        if (!Objects.equals(password, body.getHeader().getSecurity().getUsernameToken().getPassword().getValue())) {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
-        }
-
-        String fileName = format("%s_%s.xml",
-                body.getHeader().getSecurity().getUsernameToken().getUsername(),
-                body.getBody().getSendStreamRequest().getPayload().getMessage().getTrackingID()
-        );
-
-        try {
-            decodeAndSaveFile(fileName,
-                    body.getBody().getSendStreamRequest().getPayload().getMessage().getValue()
+        List<Body.Message> messages = body.getBody().getSendStreamRequest().getPayload().getMessage();
+        for (Body.Message message : messages) {
+            logger.info("SOAP Action: {} | Envelope username: {} | Envelope password: {} | Received From Client ID: {} | eHub Tracking ID: {} | IP Address: {}",
+                    soapAction,
+                    body.getHeader().getSecurity().getUsernameToken().getUsername(),
+                    body.getHeader().getSecurity().getUsernameToken().getPassword().getValue(),
+                    message.getClientID(),
+                    message.getTrackingID(),
+                    request.getRemoteAddr()
             );
-            logger.info("File with name {} saved at {}", fileName, outboundFolder);
-        } catch (IOException e) {
-            logger.error("Error saving file: {}", e.getMessage());
-            return "Error processing request.";
+            if (!Objects.equals(password, body.getHeader().getSecurity().getUsernameToken().getPassword().getValue())) {
+                throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+            }
+
+            String fileName = format("%s_%s.xml",
+                    body.getHeader().getSecurity().getUsernameToken().getUsername(),
+                    message.getTrackingID()
+            );
+
+            try {
+                decodeAndSaveFile(fileName, message.getValue());
+                logger.info("File with name {} saved at {}", fileName, outboundFolder);
+            } catch (IOException e) {
+                logger.error("Error saving file: {}", e.getMessage());
+                return "Error processing request.";
+            }
         }
 
         LocalDateTime created = LocalDateTime.now(ZoneOffset.UTC);
