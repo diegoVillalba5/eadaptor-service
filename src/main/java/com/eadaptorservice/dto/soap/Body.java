@@ -3,9 +3,13 @@ package com.eadaptorservice.dto.soap;
 import jakarta.xml.bind.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+
+import java.util.List;
 
 @Getter
 @Setter
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Body {
     @XmlElement(name = "SendStreamRequest", namespace = "http://CargoWise.com/eHub/2010/06")
@@ -13,6 +17,7 @@ public class Body {
 
     @Getter
     @Setter
+    @ToString
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class SendStreamRequest {
         @XmlElement(name = "Payload", namespace = "http://CargoWise.com/eHub/2010/06")
@@ -23,13 +28,15 @@ public class Body {
     @XmlAccessorType(XmlAccessType.FIELD)
     @Getter
     @Setter
+    @ToString
     public static class Payload {
         @XmlElement(name = "Message", namespace = "http://CargoWise.com/eHub/2010/06")
-        private Message message;
+        private List<Message> message;
     }
 
     @Getter
     @Setter
+    @ToString
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Message {
         @XmlAttribute(name = "ApplicationCode")
